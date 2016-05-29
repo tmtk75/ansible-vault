@@ -1,0 +1,11 @@
+---
+# defaults file for ansible-vault
+vault_version: 0.5.3 
+vault_sha256sum:
+  0.5.3: fddb97507f8b539534620882f3a46984160778950e4884831c0f7c2a82b65f52
+vault_install_dir: /usr/local/sbin
+vault_tmp_dir: /tmp
+vault_config_dir: /etc/vault.d
+vault_data_dir: /var/lib/vault
+vault_gomaxprocs: "{{ ansible_processor_vcpus }}"
+vault_options: ""

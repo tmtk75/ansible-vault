@@ -1,0 +1,8 @@
+---
+# handlers for vault
+- name: systemctl daemon-reload
+  shell: systemctl daemon-reload
+  notify: vault restarted
+  
+- name: vault restarted
+  service: name=vault state=restarted

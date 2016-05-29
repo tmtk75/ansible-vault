@@ -1,0 +1,91 @@
+---
+# tasks for vault
+- name: vault user
+  user: name=vault
+  tags:
+    - vault
+    - vault.user
+
+- name: vault group
+  group: name=vault
+  tags:
+    - vault
+    - vault.group
+
+- name: download vault binary
+  get_url: url=https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip
+  args:
+    force: true
+    dest: /tmp
+    mode: 0644
+    sha256sum: "{{ vault_sha256sum[vault_version] }}"
+  tags:
+    - vault
+    - vault.download
+
+#- get_url: url=https://dl.bintray.com/mitchellh/vault/{{ vault_version }}_web_ui.zip
+#  args: ... for WebUI
+#
+
+- name: install unzip
+  yum: name=unzip
+  tags:
+    - vault
+    - vault.yum
+
+- name: unarchive
+  unarchive: src={{ vault_tmp_dir }}/vault_{{ vault_version }}_linux_amd64.zip dest={{ vault_install_dir }} copy=no
+  tags:
+    - vault
+    - vault.unarchive
+
+- name: make it executable
+  file: path={{ vault_install_dir }}/vault owner=vault group=vault mode=0755 state=file
+  tags:
+    - vault
+    - vault.chmod
+
+- name: make directories
+  file: path={{ item }} owner=vault group=vault mode=0755 state=directory
+  with_items:
+    - "{{ vault_config_dir }}"
+    - "{{ vault_data_dir }}"
+  tags:
+    - vault
+    - vault.dirs
+
+- name: init-script
+  copy: src=./init-script dest=/etc/init.d/vault owner=vault group=vault mode=0755
+  when: ansible_distribution_major_version in ["6"]
+  tags:
+    - vault
+    - vault.init-script
+
+- name: sysconfig file
+  template: src=./sysconfig dest=/etc/sysconfig/vault owner=vault group=vault mode=0644
+  when: ansible_distribution_major_version in ["6", "7"]
+  tags:
+    - vault
+    - vault.conf
+
+- name: vault.service file
+  copy: src=./vault.service dest=/etc/systemd/system/vault.service owner=vault group=vault mode=0644
+  when: ansible_distribution_major_version in ["7"]
+  tags:
+    - vault
+    - vault.conf
+
+- name: config file
+  template: src=./vault.hcl dest={{ vault_config_dir }}/vault.hcl owner=vault group=vault mode=0644
+  notify:
+    - systemctl daemon-reload
+  tags:
+    - vault
+    - vault.conf
+    - vault.conf.server
+
+- name: service
+  service: name=vault state=started enabled=yes
+  tags:
+    - vault
+    - vault.service
