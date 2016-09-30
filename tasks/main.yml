@@ -41,6 +41,7 @@
 
 - name: make it executable
   file: path={{ vault_install_dir }}/vault owner=vault group=vault mode=0755 state=file
+  when: not ansible_check_mode
   tags:
     - vault
     - vault.chmod

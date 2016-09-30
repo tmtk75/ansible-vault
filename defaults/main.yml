@@ -9,3 +9,10 @@ vault_config_dir: /etc/vault.d
 vault_data_dir: /var/lib/vault
 vault_gomaxprocs: "{{ ansible_processor_vcpus }}"
 vault_options: ""
+vault_backend_consul_address: "127.0.0.1:8500"
+vault_listener_address: "127.0.0.1:8200"
+vault_disable_clustering: true
+vault_cluster_addr: ""
+vault_listener_cluster_address: ""
+vault_default_lease_ttl: "720h"
+vault_max_lease_ttl: "720h"
